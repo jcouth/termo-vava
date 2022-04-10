@@ -405,12 +405,14 @@ function App() {
   // mensagem quando ganhar ou perder
 
   useEffect(() => {
-    const _valorant = wordsArray.filter((_word) => {
-      return 3 < _word.length && _word.length < 8;
-    });
-    const randomWord = _valorant[Math.floor(Math.random() * _valorant.length)]
-      // 'Replicação'
-      .toLocaleLowerCase();
+    // const wordsFiltered = wordsArray.filter((_word) => {
+    //   return 3 < _word.length && _word.length < 8;
+    // });
+    const wordsFiltered = wordsArray;
+    const randomWord =
+      wordsFiltered[
+        Math.floor(Math.random() * wordsFiltered.length)
+      ].toLocaleLowerCase();
     setTodayWord(randomWord);
 
     setWords(
