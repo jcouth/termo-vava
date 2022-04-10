@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, KeyboardEvent  } from 'react';
 import { Board } from './components/Board';
 import {
   Keyboard,
@@ -7,8 +7,8 @@ import {
 } from './components/Keyboard';
 import { Modal } from './components/Modal';
 import { WordProps } from './components/Word';
-
 import { Container } from './styles';
+import toast, { Toaster } from 'react-hot-toast';
 
 export type ClickProps =
   | {
@@ -221,35 +221,6 @@ function App() {
     .REACT_APP_VALORANT!.split(', ')
     .map((word) => word.toLowerCase());
 
-  const literalValue = (key: string): string => {
-    const a = ['à', 'á', 'â', 'ã'];
-    const e = ['è', 'é', 'ê'];
-    const i = ['ì', 'í', 'î'];
-    const o = ['ò', 'ó', 'ô', 'õ'];
-    const u = ['ù', 'ú', 'û'];
-
-    if (a.includes(key)) {
-      return 'a';
-    }
-    if (e.includes(key)) {
-      return 'e';
-    }
-    if (i.includes(key)) {
-      return 'i';
-    }
-    if (o.includes(key)) {
-      return 'o';
-    }
-    if (u.includes(key)) {
-      return 'u';
-    }
-    if (key === 'ç') {
-      return 'c';
-    }
-
-    return key;
-  };
-
   const handleClick = ({
     letter,
     positionClick,
@@ -331,7 +302,15 @@ function App() {
           return _word === word.map((letter) => letter.value).join('');
         }).length > 0;
       if (!check) {
-        alert('inválida');
+        toast('Palavra inválida', {
+          icon: '❌',
+          duration: 2000,
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          },
+        });
       } else {
         const today = todayWord.split('');
         const positions: number[] = [];
@@ -342,7 +321,7 @@ function App() {
         word.map((letter, index) => {
           do {
             if (
-              letter.value === literalValue(today[i]) &&
+              letter.value === normalizeLetter(today[i]) &&
               !positions.includes(i)
             ) {
               positions.push(i);
@@ -399,6 +378,25 @@ function App() {
     }
   };
 
+  /**
+   *  CREATED BY gxstav
+   *  new functions:
+   *     - handleKeyPress
+   *     - isValidKey
+   *     - normalizeLetter
+   */
+
+  const handleKeyPress = (e: KeyboardEvent<HTMLImageElement>)  => {
+    const letter = normalizeLetter(e.key);
+    if (isValidKey(letter)) handleClick({letter});
+    if (letter === 'Backspace') handleBack();
+    if (letter === 'Enter') {} // TODO: usar função handleEnter
+  };
+
+  const isValidKey = (key: string) => key.length === 1 ? key.match(/[aA-zZ]/) ? true : false : false;
+
+  const normalizeLetter = (letter: string) => letter.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
   // efeitos nas letras do board
   // digitar e preencher o board
   // adicionar acento no board
@@ -428,22 +426,28 @@ function App() {
 
   return (
     <Container>
-      <Modal words={words} visible={finished} />
-      <Board
-        words={words}
-        finished={finished}
-        line={line.current}
-        position={position.current}
-        onClick={(position: number) => {
-          handleClick({ positionClick: position, isTrusted: true });
-        }}
+      <Toaster
+        position="top-center"
+        reverseOrder={true}
       />
-      <Keyboard
-        keys={keys}
-        onClick={(letter: string) => handleClick({ letter })}
-        onBack={handleBack}
-        onEnter={handleEnter}
-      />
+      <div onKeyDown={handleKeyPress}>
+      <Modal words={words} visible={finished}/>
+        <Board
+          words={words}
+          finished={finished}
+          line={line.current}
+          position={position.current}
+          onClick={(position: number) => {
+            handleClick({ positionClick: position, isTrusted: true });
+          }}
+        />
+        <Keyboard
+          keys={keys}
+          onClick={(letter: string) => handleClick({ letter })}
+          onBack={handleBack}
+          onEnter={handleEnter}
+        />
+      </div>
     </Container>
   );
 }
