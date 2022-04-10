@@ -322,12 +322,12 @@ function App() {
       const check =
         wordsArray.filter((wordArray) => {
           const _word = wordArray
-            .replaceAll(/([áàâã])+/g, 'a')
-            .replaceAll(/([éèê])+/g, 'e')
-            .replaceAll(/([íìî])+/g, 'i')
-            .replaceAll(/([óòôõ])+/g, 'o')
-            .replaceAll(/([úùû])+/g, 'u')
-            .replaceAll(/([ç])+/g, 'c');
+            .replace(/([áàâã])+/g, 'a')
+            .replace(/([éèê])+/g, 'e')
+            .replace(/([íìî])+/g, 'i')
+            .replace(/([óòôõ])+/g, 'o')
+            .replace(/([úùû])+/g, 'u')
+            .replace(/([ç])+/g, 'c');
           return _word === word.map((letter) => letter.value).join('');
         }).length > 0;
       if (!check) {
